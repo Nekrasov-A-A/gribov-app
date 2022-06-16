@@ -11,14 +11,6 @@
             <router-link to="/" class="reset-link"
               ><v-btn text class="white--text">Меню</v-btn></router-link
             >
-            <v-divider
-              class="mx-4 white"
-              vertical
-              style="height: 40px"
-            ></v-divider>
-            <router-link to="/hospitals" class="reset-link"
-              ><v-btn text class="white--text">Больницы</v-btn></router-link
-            >
           </div>
           <div class="d-flex align-center">
             <div>

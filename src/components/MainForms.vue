@@ -105,7 +105,7 @@
           <v-icon>mdi-download </v-icon>
         </button>
       </template>
-      <span>Скачать Excel-файл</span>
+      <span>Скачать PDF-файл</span>
     </v-tooltip>
   </div>
 </template>
@@ -131,6 +131,7 @@ export default {
       "getProductLineById",
       "getIngredietnsForDishForUIFromState",
       "getProductLinesFromState",
+      "getUserNameFromState",
     ]),
 
     getDishesByName() {
@@ -173,7 +174,7 @@ export default {
         this.getProductLinesFromState,
         this.getHashForHospitals
       );
-      exportCSVFile(hash);
+      exportCSVFile(hash, this.getUserNameFromState);
     },
     ...mapMutations([
       "addItemToCurrentDay",

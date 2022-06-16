@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    currentDay: [],
+    currentDay: [], // {"завтрак": [], "обед": [], "ужин": []}
     hospitals: [],
     productLines: [],
     ration: {},
@@ -19,6 +19,7 @@ export default new Vuex.Store({
   getters: {
     getHashForHospitals: (s) => s.hashForHospitals,
     getCurrentDayFromState: (s) => s.currentDay,
+    getPartOfCurrentDayFromState: (s) => (part) => s.currentDay[part],
     getCurrentDayWithFilterByDiets: (s) => (array) => {
       let helper = array.map((el) => el.id);
       let hash = {};
@@ -134,7 +135,7 @@ export default new Vuex.Store({
     updateProductLinesForState: (state, payload) => {
       state.productLines = payload;
     },
-    
+
     updateUserNameForState: (state, payload) => {
       state.userName = payload;
     },

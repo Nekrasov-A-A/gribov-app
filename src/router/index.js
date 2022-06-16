@@ -7,7 +7,7 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: () => import("../components/MenuPick.vue"),
+    component: () => import("../views/MenuPage.vue"),
   },
   {
     path: "/hospitals",

@@ -155,5 +155,5 @@ export default {
 <style lang="sass" scoped>
 .dish-form-wrappper
   margin: 0 20%
-  height: calc(100vh - 84px)
+  min-height: calc(100vh - 84px)
 </style>
