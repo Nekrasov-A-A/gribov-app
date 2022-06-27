@@ -22,7 +22,7 @@
                       autofocus
                       label="Введите пароль"
                       :rules="[
-                        (v) => v === truePassword || 'Неправильный пароль',
+                        (v) => v === passwordForAdmin || 'Неправильный пароль',
                       ]"
                     ></v-text-field>
                   </v-form>
@@ -85,7 +85,7 @@ export default {
     isLoading: true,
     isValidAdmin: true,
     password: "",
-    truePassword: "1111",
+    passwordForAdmin: "1111",
   }),
   computed: {
     ...mapGetters([

@@ -4,8 +4,8 @@
       <h2 class="mb-6">Выбранные</h2>
       <v-form v-model="isValidFormForCurrentDay" class="menu-dishcard-wrapper">
         <v-card
-          v-for="dish in getCurrentDayFromState"
-          :key="dish.id"
+          v-for="dish in getPartOfCurrentDayFromState(eatingTime)"
+          :key="dish.id + eatingTime"
           class="d-flex flex-column"
         >
           <v-card-text class="d-flex justify-center mt-4">
@@ -31,11 +31,6 @@
           </v-btn>
         </v-card>
       </v-form>
-      <div class="mt-10">
-        <v-btn @click="saveCurrentDay" color="primary" class="mr-6 pa-4"
-          >Сохранить</v-btn
-        >
-      </div>
     </div>
     <v-text-field
       v-model="searchForMenu"
@@ -69,6 +64,9 @@
 import { mapMutations, mapGetters } from "vuex";
 import CardSimple from "./CardSimple.vue";
 export default {
+  props: {
+    eatingTime: String,
+  },
   components: { CardSimple },
   data: function () {
     return {
@@ -82,6 +80,7 @@ export default {
       "getDishesFromState",
       "getDietsWithFilterByID",
       "getProductLineById",
+      "getPartOfCurrentDayFromState",
     ]),
     getDishesByName() {
       return this.getNonSelectDishes.filter((el) => {
@@ -92,7 +91,10 @@ export default {
     },
     getNonSelectDishes() {
       return this.getCorrectDishes.filter(
-        (el) => !this.getCurrentDayFromState.includes(el)
+        (el) =>
+          !this.getPartOfCurrentDayFromState(this.eatingTime).find(
+            (dish) => dish.id === el.id
+          )
       );
     },
     getCorrectDishes() {
@@ -115,22 +117,18 @@ export default {
       "deleteDishForCurrentDayFromState",
       "updateCurrentDay",
     ]),
-    saveCurrentDay() {
-      if (this.isValidFormForCurrentDay) {
-        this.$router.push("/hospitals");
-      }
-    },
     addToTodayMenu(val) {
       val.includesDiets = this.getDietsWithFilterByID(val.includesDiets);
       val.productLine = this.getProductLineById(val.productLine);
       val.amount = "1";
-      this.addItemToCurrentDay(val);
+      val = JSON.parse(JSON.stringify(val));
+      this.addItemToCurrentDay([this.eatingTime, val]);
     },
     deleteFromTodayMenu(val) {
-      let currentIdx = this.getCurrentDayFromState.findIndex(
-        (el) => el.dishName === val.dishName
-      );
-      this.deleteDishForCurrentDayFromState(currentIdx);
+      let currentIdx = this.getPartOfCurrentDayFromState(
+        this.eatingTime
+      ).findIndex((el) => el.dishName === val.dishName);
+      this.deleteDishForCurrentDayFromState([this.eatingTime, currentIdx]);
     },
   },
 };

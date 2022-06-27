@@ -52,7 +52,7 @@
       ></v-autocomplete>
       <div class="d-flex flex-column align-center justify-center">
         <v-text-field
-          v-for="ingredient in setTest"
+          v-for="ingredient in setIngredientWeight"
           :key="ingredient.id"
           label="Введите вес ингредиента"
           suffix="гр/мл"
@@ -87,7 +87,7 @@ export default {
       "getDietsWithFilterByName",
       "getProductLineIdByName",
     ]),
-    setTest() {
+    setIngredientWeight() {
       return this.selectIngredients.map((el) => {
         let current = this.getIngredientsFromState.find(
           (elem) => elem.ingredientName === el
@@ -131,7 +131,7 @@ export default {
             (el) => el.id
           ),
           dishWeight: this.dishWeight,
-          ingredients: [...this.setTest],
+          ingredients: [...this.setIngredientWeight],
         };
         dishData.ingredients = dishData.ingredients.map((el) => {
           let obj = {

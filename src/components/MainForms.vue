@@ -1,12 +1,6 @@
 <template>
   <div class="d-flex flex-column align-center justify-center pb-10 mt-4">
     <div>
-      <!-- <v-select
-        :items="getHospitalsFromState.map((el) => el.hospitalName)"
-        label="Выберите больницу"
-        solo
-        v-model="currentHospital"
-      ></v-select> -->
       <v-tabs background-color="white" centered class="pt-4 mb-6">
         <v-tabs-slider class="blue"></v-tabs-slider>
         <v-tab
@@ -39,9 +33,6 @@
                 >
                   {{ dietTitle.dietName }}
                 </th>
-                <th></th>
-                <th></th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -58,14 +49,12 @@
                     dense
                     v-model="diet.amount"
                     :rules="[(v) => !!v || '', (v) => +v >= 0 || '']"
-                    class="testiiing"
+                    class="diet-control"
                   >
                   </v-text-field>
                 </td>
                 <td v-if="department.isCalc">
-                  <OverlayManualEditing
-                    :dishObject="department.includesDishes"
-                  />
+                  <OverlayManualEditing :dishInfo="department.includesDishes" />
                 </td>
                 <td v-if="!department.isAnotherMenu">
                   <v-tooltip top color="black">
@@ -133,32 +122,6 @@ export default {
       "getProductLinesFromState",
       "getUserNameFromState",
     ]),
-
-    getDishesByName() {
-      return this.getNonSelectDishes.filter((el) => {
-        return el.dishName
-          .toLowerCase()
-          .includes(this.searchForMenu.toLowerCase());
-      });
-    },
-    getNonSelectDishes() {
-      return this.getCorrectDishes.filter(
-        (el) => !this.getCurrentDayFromState.includes(el)
-      );
-    },
-    getCorrectDishes() {
-      return this.getDishesFromState.filter((dish) => {
-        if (
-          dish.productLine !== "" &&
-          dish.includesDiets.length !== 0 &&
-          dish.ingredients.length !== 0
-        ) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-    },
   },
   data: function () {
     return {
@@ -195,23 +158,25 @@ export default {
         department.includesDiets.reduce((acc, val) => (acc += +val.amount), 0) >
           0
       ) {
-        department.includesDishes.map((dish) => {
-          let dietsForCount = dish.includesDiets.map((dishDiet) => {
-            return department.includesDiets.find(
-              (diet) => diet.dietName === dishDiet.dietName
+        for (let val of Object.values(department.includesDishes)) {
+          val.map((dish) => {
+            let dietsForCount = dish.includesDiets.map((dishDiet) => {
+              return department.includesDiets.find(
+                (diet) => diet.dietName === dishDiet.dietName
+              );
+            });
+            let totalAmountForDish = dietsForCount
+              .filter((el) => el !== undefined)
+              .reduce((acc, curr) => acc + +curr.amount, 0);
+            dish.totalAmountClients = totalAmountForDish;
+            dish.totalWeight =
+              dish.totalAmountClients * dish.dishWeight * dish.amount + "";
+            dish.ingredients = this.getIngredietnsForDishForUIFromState(
+              dish.ingredients
             );
+            return dish;
           });
-          let totalAmountForDish = dietsForCount
-            .filter((el) => el !== undefined)
-            .reduce((acc, curr) => acc + +curr.amount, 0);
-          dish.totalAmountClients = totalAmountForDish;
-          dish.totalWeight =
-            dish.totalAmountClients * dish.dishWeight * dish.amount + "";
-          dish.ingredients = this.getIngredietnsForDishForUIFromState(
-            dish.ingredients
-          );
-          return dish;
-        });
+        }
         department.isCalc = true;
         this.$forceUpdate();
       }
@@ -273,7 +238,7 @@ export default {
 .department-table-wrapper
   display: grid
   grid-template-columns: repeat(4, 1fr )
-.testiiing
+.diet-control
   font-size: 14px
   width: 30px
 .current-dish-delete

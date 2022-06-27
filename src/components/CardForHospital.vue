@@ -181,7 +181,7 @@ import DialogBottom from "./DialogBottom.vue";
 import CardSelectItem from "./CardSelectItem.vue";
 import { mapMutations, mapGetters, mapActions } from "vuex";
 export default {
-  props: ["hospital", "hospitalIndex"],
+  props: { hospital: Object, hospitalIndex: Number },
   components: { CardForData, CardSimple, DialogBottom, CardSelectItem },
   computed: {
     ...mapGetters([

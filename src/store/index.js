@@ -6,7 +6,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    currentDay: [], // {"завтрак": [], "обед": [], "ужин": []}
+    // currentDay: [], // {"завтрак": [], "обед": [], "ужин": []} fake
+    currentDay: { завтрак: [], обед: [], ужин: [] },
     hospitals: [],
     productLines: [],
     ration: {},
@@ -23,25 +24,30 @@ export default new Vuex.Store({
     getCurrentDayWithFilterByDiets: (s) => (array) => {
       let helper = array.map((el) => el.id);
       let hash = {};
-      return s.currentDay
-        .map((dish) =>
-          dish.includesDiets.filter((dishDiet) =>
-            typeof dishDiet === "string"
-              ? helper.includes(dishDiet)
-              : helper.includes(dishDiet.id)
-          ).length === 0
-            ? undefined
-            : dish
-        )
-        .filter((el) => el !== undefined)
-        .filter((dish) => {
-          if (hash[dish.id]) {
-            return false;
-          } else {
-            hash[dish.id] = true;
-            return true;
-          }
-        });
+      let obj = {};
+      for (let [key, val] of Object.entries(s.currentDay)) {
+        hash = {};
+        obj[key] = val
+          .map((dish) =>
+            dish.includesDiets.filter((dishDiet) =>
+              typeof dishDiet === "string"
+                ? helper.includes(dishDiet)
+                : helper.includes(dishDiet.id)
+            ).length === 0
+              ? undefined
+              : dish
+          )
+          .filter((el) => el !== undefined)
+          .filter((dish) => {
+            if (hash[dish.id]) {
+              return false;
+            } else {
+              hash[dish.id] = true;
+              return true;
+            }
+          });
+      }
+      return obj;
     },
     getHospitalsFromState: (s) => s.hospitals,
     getUserNameFromState: (s) => s.userName,
@@ -219,8 +225,9 @@ export default new Vuex.Store({
       );
       state.dishes[dishIndex].ingredients.splice(currentIdx, 1);
     },
-    deleteDishForCurrentDayFromState: (state, index) => {
-      state.currentDay.splice(index, 1);
+    deleteDishForCurrentDayFromState: (state, payload) => {
+      let [part, index] = payload;
+      state.currentDay[part].splice(index, 1);
     },
     clearIngredientsForState: (state) => {
       state.ingredients.forEach((el) => delete el.ingredientWeightForNewDish);
@@ -302,7 +309,8 @@ export default new Vuex.Store({
       state.dishes.push(payload);
     },
     addItemToCurrentDay: (state, payload) => {
-      state.currentDay.push(payload);
+      let [part, dishes] = payload;
+      state.currentDay[part].push(dishes);
     },
     // ADD ITEM END
   },

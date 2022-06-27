@@ -51,7 +51,7 @@
 import CardSimple from "./CardSimple.vue";
 export default {
   components: { CardSimple },
-  props: ["alreadySelected", "arrayData"],
+  props: { alreadySelected: Array, arrayData: Array },
   computed: {
     getNonSelectItems: function () {
       return this.dataArray.filter((el) => !this.selectedItems.includes(el));

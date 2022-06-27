@@ -271,7 +271,7 @@ import DialogBottom from "./DialogBottom.vue";
 import CardSimple from "./CardSimple.vue";
 import CardSelectItem from "./CardSelectItem.vue";
 export default {
-  props: ["dishObject"],
+  props: { dishInfo: Object },
   components: { DialogBottom, CardSimple, CardSelectItem },
   computed: {
     ...mapGetters([
@@ -295,7 +295,7 @@ export default {
       isEdit: false,
       newDishName: "",
       isValidDishName: true,
-      dish: this.dishObject,
+      dish: this.dishInfo,
       isShowProductLine: false,
       productLineName: "",
       selectNewProductLine: "",

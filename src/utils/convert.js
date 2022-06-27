@@ -1,165 +1,126 @@
 import { jsPDF } from "jspdf";
 import "../fonts/RobotoRegular-normal";
-
+let helper = ["завтрак", "обед", "ужин"];
+let changeFirstLetter = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
 const convertToCSV = (hash, dataName) => {
   const doc = new jsPDF();
   doc.setFont("RobotoRegular");
-  let res = []; ////////////////
-  hash.forEach((prodLine) => {
-    res.push(prodLine.productLineName + "\n"); ////////////////
-    hash.indexOf(prodLine) === 0 ? null : doc.addPage();
+  helper.forEach((mealTime) => {
+    hash.forEach((prodLine) => {
+      if (Object.keys(prodLine[mealTime].dishes).length > 0) {
+        hash.indexOf(prodLine) === 0 && helper.indexOf(mealTime) === 0
+          ? null
+          : doc.addPage();
 
-    //210 297 ___A4 size
-    doc.setFontSize(12);
-    doc.text(dataName, 4, 4);
-    doc.setFontSize(16);
-    doc.text(prodLine.productLineName, 100, 10, { align: "center" });
-    let currentHeightOfPage = 14;
-    Object.keys(prodLine.dishes).forEach((dishName) => {
-      let line =
-        dishName +
-        " " +
-        Math.round(prodLine.dishes[dishName].totalAmountOfWeight / 1000) +
-        " " +
-        "кг" +
-        " " +
-        prodLine.dishes[dishName].totalAmountOfWeight +
-        " " +
-        "гр";
-      doc.setFontSize(12);
-      let isCurrentPage = currentHeightOfPage + 6 <= 277;
-      if (isCurrentPage) {
-        currentHeightOfPage += 6;
-        doc.text(line, 8, currentHeightOfPage);
-      } else {
-        doc.addPage();
-        currentHeightOfPage = 10;
-        doc.text(line, 8, currentHeightOfPage);
-      }
+        //210 297 ___A4 size
+        doc.setFontSize(12);
+        doc.text(dataName, 4, 4);
+        doc.setFontSize(16);
+        doc.text(
+          `${prodLine.productLineName}-${changeFirstLetter(mealTime)}`,
+          100,
+          10,
+          { align: "center" }
+        );
+        let currentHeightOfPage = 14;
+        Object.keys(prodLine[mealTime].dishes).forEach((dishName) => {
+          let line =
+            dishName +
+            " " +
+            Math.round(
+              prodLine[mealTime].dishes[dishName].totalAmountOfWeight / 1000
+            ) +
+            " " +
+            "кг" +
+            " " +
+            prodLine[mealTime].dishes[dishName].totalAmountOfWeight +
+            " " +
+            "гр";
+          doc.setFontSize(16);
+          let isCurrentPage = currentHeightOfPage + 8 <= 277;
+          if (isCurrentPage) {
+            currentHeightOfPage += 8;
+            doc.text(line, 8, currentHeightOfPage);
+          } else {
+            doc.addPage();
+            currentHeightOfPage = 10;
+            doc.text(line, 8, currentHeightOfPage);
+          }
 
-      prodLine.dishes[dishName].ingredients.forEach((ingred) => {
-        let ingredLine =
-          ingred.ingredientName +
-          " " +
-          Math.round(ingred.totalIngredientWeight / 1000) +
-          " " +
-          "кг" +
-          " " +
-          ingred.totalIngredientWeight +
-          " " +
-          "гр";
-        doc.setFontSize(10);
-        let isCurrentPageForIngredients = currentHeightOfPage + 4 <= 277;
-        if (isCurrentPageForIngredients) {
-          currentHeightOfPage += 4;
-          doc.text(ingredLine, 12, currentHeightOfPage);
-        } else {
-          doc.addPage();
-          currentHeightOfPage = 10;
-          doc.text(ingredLine, 12, currentHeightOfPage);
-        }
-      });
-    });
-    doc.addPage();
-    doc.setFontSize(12);
-    doc.text(dataName, 4, 4);
-    doc.setFontSize(16);
-    doc.text(`${prodLine.productLineName}:Отгрузка`, 100, 10, {
-      align: "center",
-    });
-    res.push(prodLine.productLineName + "\n"); //////////////////
-    let currentHeightOfPageForShipment = 14;
-    let heightForSecondCol = 14;
-    let heightForThirdCol = 14;
-    Object.keys(prodLine.hospitals).forEach((hospitalName) => {
-      let step = 0;
-      doc.setFontSize(11);
-      let isCurrentPageForShipment = currentHeightOfPageForShipment + 6 <= 277;
-      if (isCurrentPageForShipment) {
-        currentHeightOfPageForShipment += 6;
-        heightForSecondCol = currentHeightOfPageForShipment;
-        heightForThirdCol = currentHeightOfPageForShipment;
-        doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
-          align: "center",
-        });
-      } else {
-        doc.addPage();
-        currentHeightOfPageForShipment = 10;
-        heightForSecondCol = 10;
-        currentHeightOfPageForShipment = 10;
-        doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
-          align: "center",
-        });
-      }
-      res.push("," + hospitalName + "\n"); /////////////////////////////
-      Object.keys(prodLine.hospitals[hospitalName]).forEach(
-        (departmentName) => {
-          doc.setFontSize(10);
-          isCurrentPageForShipment = currentHeightOfPageForShipment + 6 <= 277;
-          if (isCurrentPageForShipment) {
-            if (step === 0) {
-              currentHeightOfPageForShipment += 6;
-              doc.text(departmentName, 4, currentHeightOfPageForShipment);
-            } else if (step === 1) {
-              heightForSecondCol += 6;
-              doc.text(departmentName, 74, heightForSecondCol);
+          prodLine[mealTime].dishes[dishName].ingredients.forEach((ingred) => {
+            let ingredLine =
+              ingred.ingredientName +
+              " " +
+              Math.round(ingred.totalIngredientWeight / 1000) +
+              " " +
+              "кг" +
+              " " +
+              ingred.totalIngredientWeight +
+              " " +
+              "гр";
+            doc.setFontSize(14);
+            let isCurrentPageForIngredients = currentHeightOfPage + 6 <= 277;
+            if (isCurrentPageForIngredients) {
+              currentHeightOfPage += 6;
+              doc.text(ingredLine, 12, currentHeightOfPage);
             } else {
-              heightForThirdCol += 6;
-              doc.text(departmentName, 148, heightForThirdCol);
+              doc.addPage();
+              currentHeightOfPage = 10;
+              doc.text(ingredLine, 12, currentHeightOfPage);
             }
+          });
+        });
+        doc.addPage();
+        doc.setFontSize(12);
+        doc.text(dataName, 4, 4);
+        doc.setFontSize(16);
+        doc.text(
+          `${prodLine.productLineName}-${changeFirstLetter(mealTime)}:Отгрузка`,
+          100,
+          10,
+          {
+            align: "center",
+          }
+        );
+        let currentHeightOfPageForShipment = 14;
+        let heightForSecondCol = 14;
+        let heightForThirdCol = 14;
+        Object.keys(prodLine[mealTime].hospitals).forEach((hospitalName) => {
+          let step = 0;
+          doc.setFontSize(11);
+          let isCurrentPageForShipment =
+            currentHeightOfPageForShipment + 6 <= 277;
+          if (isCurrentPageForShipment) {
+            currentHeightOfPageForShipment += 6;
+            heightForSecondCol = currentHeightOfPageForShipment;
+            heightForThirdCol = currentHeightOfPageForShipment;
+            doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
+              align: "center",
+            });
           } else {
             doc.addPage();
             currentHeightOfPageForShipment = 10;
             heightForSecondCol = 10;
-            heightForThirdCol = 10;
-            step = 0;
-            if (step === 0) {
-              currentHeightOfPageForShipment += 6;
-              doc.text(departmentName, 4, currentHeightOfPageForShipment);
-            } else if (step === 1) {
-              heightForSecondCol += 6;
-              doc.text(departmentName, 74, heightForSecondCol);
-            } else {
-              heightForThirdCol += 6;
-              doc.text(departmentName, 148, heightForThirdCol);
-            }
+            currentHeightOfPageForShipment = 10;
+            doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
+              align: "center",
+            });
           }
-
-          res.push("," + "," + departmentName.replace(/,/g, "+") + "\n"); ///////////////////////////////
-          Object.keys(prodLine.hospitals[hospitalName][departmentName]).forEach(
-            (dishName) => {
-              let dishLineForShipment =
-                dishName +
-                " " +
-                Math.round(
-                  prodLine.hospitals[hospitalName][departmentName][dishName] /
-                    1000
-                ) +
-                " " +
-                "кг" +
-                " " +
-                prodLine.hospitals[hospitalName][departmentName][dishName] +
-                " " +
-                "гр";
-              doc.setFontSize(9);
+          Object.keys(prodLine[mealTime].hospitals[hospitalName]).forEach(
+            (departmentName) => {
+              doc.setFontSize(10);
               isCurrentPageForShipment =
-                currentHeightOfPageForShipment + 4 <= 277 &&
-                heightForSecondCol + 4 <= 277 &&
-                heightForThirdCol + 4 <= 277;
+                currentHeightOfPageForShipment + 6 <= 277;
               if (isCurrentPageForShipment) {
                 if (step === 0) {
-                  currentHeightOfPageForShipment += 4;
-                  doc.text(
-                    dishLineForShipment,
-                    8,
-                    currentHeightOfPageForShipment
-                  );
+                  currentHeightOfPageForShipment += 6;
+                  doc.text(departmentName, 4, currentHeightOfPageForShipment);
                 } else if (step === 1) {
-                  heightForSecondCol += 4;
-                  doc.text(dishLineForShipment, 78, heightForSecondCol);
+                  heightForSecondCol += 6;
+                  doc.text(departmentName, 74, heightForSecondCol);
                 } else {
-                  heightForThirdCol += 4;
-                  doc.text(dishLineForShipment, 148, heightForThirdCol);
+                  heightForThirdCol += 6;
+                  doc.text(departmentName, 148, heightForThirdCol);
                 }
               } else {
                 doc.addPage();
@@ -168,46 +129,265 @@ const convertToCSV = (hash, dataName) => {
                 heightForThirdCol = 10;
                 step = 0;
                 if (step === 0) {
-                  currentHeightOfPageForShipment += 4;
-                  doc.text(
-                    dishLineForShipment,
-                    8,
-                    currentHeightOfPageForShipment
-                  );
+                  currentHeightOfPageForShipment += 6;
+                  doc.text(departmentName, 4, currentHeightOfPageForShipment);
                 } else if (step === 1) {
-                  heightForSecondCol += 4;
-                  doc.text(dishLineForShipment, 78, heightForSecondCol);
+                  heightForSecondCol += 6;
+                  doc.text(departmentName, 74, heightForSecondCol);
                 } else {
-                  heightForThirdCol += 4;
-                  doc.text(dishLineForShipment, 148, heightForThirdCol);
+                  heightForThirdCol += 6;
+                  doc.text(departmentName, 148, heightForThirdCol);
                 }
               }
-              //
-              res.push(
-                "," +
-                  "," +
-                  "," +
+
+              Object.keys(
+                prodLine[mealTime].hospitals[hospitalName][departmentName]
+              ).forEach((dishName) => {
+                let dishLineForShipment =
                   dishName +
-                  "," +
-                  (
-                    prodLine.hospitals[hospitalName][departmentName][dishName] /
-                    1000
-                  ).toFixed(1) +
-                  "," +
+                  " " +
+                  Math.round(
+                    prodLine[mealTime].hospitals[hospitalName][departmentName][
+                      dishName
+                    ] / 1000
+                  ) +
+                  " " +
                   "кг" +
-                  "," +
-                  prodLine.hospitals[hospitalName][departmentName][dishName] +
-                  "," +
-                  "грамм" +
-                  "\n"
-              ); //
+                  " " +
+                  prodLine[mealTime].hospitals[hospitalName][departmentName][
+                    dishName
+                  ] +
+                  " " +
+                  "гр";
+                doc.setFontSize(9);
+                isCurrentPageForShipment =
+                  currentHeightOfPageForShipment + 4 <= 277 &&
+                  heightForSecondCol + 4 <= 277 &&
+                  heightForThirdCol + 4 <= 277;
+                if (isCurrentPageForShipment) {
+                  if (step === 0) {
+                    currentHeightOfPageForShipment += 4;
+                    doc.text(
+                      dishLineForShipment,
+                      8,
+                      currentHeightOfPageForShipment
+                    );
+                  } else if (step === 1) {
+                    heightForSecondCol += 4;
+                    doc.text(dishLineForShipment, 78, heightForSecondCol);
+                  } else {
+                    heightForThirdCol += 4;
+                    doc.text(dishLineForShipment, 148, heightForThirdCol);
+                  }
+                } else {
+                  doc.addPage();
+                  currentHeightOfPageForShipment = 10;
+                  heightForSecondCol = 10;
+                  heightForThirdCol = 10;
+                  step = 0;
+                  if (step === 0) {
+                    currentHeightOfPageForShipment += 4;
+                    doc.text(
+                      dishLineForShipment,
+                      8,
+                      currentHeightOfPageForShipment
+                    );
+                  } else if (step === 1) {
+                    heightForSecondCol += 4;
+                    doc.text(dishLineForShipment, 78, heightForSecondCol);
+                  } else {
+                    heightForThirdCol += 4;
+                    doc.text(dishLineForShipment, 148, heightForThirdCol);
+                  }
+                }
+              });
+              step = step + 1 > 2 ? 0 : step + 1;
             }
           );
-          step = step + 1 > 2 ? 0 : step + 1;
-        }
-      );
+        });
+      }
     });
   });
+  // hash.forEach((prodLine) => {
+  //   hash.indexOf(prodLine) === 0 ? null : doc.addPage();
+
+  //   //210 297 ___A4 size
+  //   doc.setFontSize(12);
+  //   doc.text(dataName, 4, 4);
+  //   doc.setFontSize(16);
+  //   doc.text(prodLine.productLineName, 100, 10, { align: "center" });
+  //   let currentHeightOfPage = 14;
+  //   Object.keys(prodLine.dishes).forEach((dishName) => {
+  //     let line =
+  //       dishName +
+  //       " " +
+  //       Math.round(prodLine.dishes[dishName].totalAmountOfWeight / 1000) +
+  //       " " +
+  //       "кг" +
+  //       " " +
+  //       prodLine.dishes[dishName].totalAmountOfWeight +
+  //       " " +
+  //       "гр";
+  //     doc.setFontSize(12);
+  //     let isCurrentPage = currentHeightOfPage + 6 <= 277;
+  //     if (isCurrentPage) {
+  //       currentHeightOfPage += 6;
+  //       doc.text(line, 8, currentHeightOfPage);
+  //     } else {
+  //       doc.addPage();
+  //       currentHeightOfPage = 10;
+  //       doc.text(line, 8, currentHeightOfPage);
+  //     }
+
+  //     prodLine.dishes[dishName].ingredients.forEach((ingred) => {
+  //       let ingredLine =
+  //         ingred.ingredientName +
+  //         " " +
+  //         Math.round(ingred.totalIngredientWeight / 1000) +
+  //         " " +
+  //         "кг" +
+  //         " " +
+  //         ingred.totalIngredientWeight +
+  //         " " +
+  //         "гр";
+  //       doc.setFontSize(10);
+  //       let isCurrentPageForIngredients = currentHeightOfPage + 4 <= 277;
+  //       if (isCurrentPageForIngredients) {
+  //         currentHeightOfPage += 4;
+  //         doc.text(ingredLine, 12, currentHeightOfPage);
+  //       } else {
+  //         doc.addPage();
+  //         currentHeightOfPage = 10;
+  //         doc.text(ingredLine, 12, currentHeightOfPage);
+  //       }
+  //     });
+  //   });
+  //   doc.addPage();
+  //   doc.setFontSize(12);
+  //   doc.text(dataName, 4, 4);
+  //   doc.setFontSize(16);
+  //   doc.text(`${prodLine.productLineName}:Отгрузка`, 100, 10, {
+  //     align: "center",
+  //   });
+  //   let currentHeightOfPageForShipment = 14;
+  //   let heightForSecondCol = 14;
+  //   let heightForThirdCol = 14;
+  //   Object.keys(prodLine.hospitals).forEach((hospitalName) => {
+  //     let step = 0;
+  //     doc.setFontSize(11);
+  //     let isCurrentPageForShipment = currentHeightOfPageForShipment + 6 <= 277;
+  //     if (isCurrentPageForShipment) {
+  //       currentHeightOfPageForShipment += 6;
+  //       heightForSecondCol = currentHeightOfPageForShipment;
+  //       heightForThirdCol = currentHeightOfPageForShipment;
+  //       doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
+  //         align: "center",
+  //       });
+  //     } else {
+  //       doc.addPage();
+  //       currentHeightOfPageForShipment = 10;
+  //       heightForSecondCol = 10;
+  //       currentHeightOfPageForShipment = 10;
+  //       doc.text(hospitalName, 100, currentHeightOfPageForShipment, {
+  //         align: "center",
+  //       });
+  //     }
+  //     Object.keys(prodLine.hospitals[hospitalName]).forEach(
+  //       (departmentName) => {
+  //         doc.setFontSize(10);
+  //         isCurrentPageForShipment = currentHeightOfPageForShipment + 6 <= 277;
+  //         if (isCurrentPageForShipment) {
+  //           if (step === 0) {
+  //             currentHeightOfPageForShipment += 6;
+  //             doc.text(departmentName, 4, currentHeightOfPageForShipment);
+  //           } else if (step === 1) {
+  //             heightForSecondCol += 6;
+  //             doc.text(departmentName, 74, heightForSecondCol);
+  //           } else {
+  //             heightForThirdCol += 6;
+  //             doc.text(departmentName, 148, heightForThirdCol);
+  //           }
+  //         } else {
+  //           doc.addPage();
+  //           currentHeightOfPageForShipment = 10;
+  //           heightForSecondCol = 10;
+  //           heightForThirdCol = 10;
+  //           step = 0;
+  //           if (step === 0) {
+  //             currentHeightOfPageForShipment += 6;
+  //             doc.text(departmentName, 4, currentHeightOfPageForShipment);
+  //           } else if (step === 1) {
+  //             heightForSecondCol += 6;
+  //             doc.text(departmentName, 74, heightForSecondCol);
+  //           } else {
+  //             heightForThirdCol += 6;
+  //             doc.text(departmentName, 148, heightForThirdCol);
+  //           }
+  //         }
+
+  //         Object.keys(prodLine.hospitals[hospitalName][departmentName]).forEach(
+  //           (dishName) => {
+  //             let dishLineForShipment =
+  //               dishName +
+  //               " " +
+  //               Math.round(
+  //                 prodLine.hospitals[hospitalName][departmentName][dishName] /
+  //                   1000
+  //               ) +
+  //               " " +
+  //               "кг" +
+  //               " " +
+  //               prodLine.hospitals[hospitalName][departmentName][dishName] +
+  //               " " +
+  //               "гр";
+  //             doc.setFontSize(9);
+  //             isCurrentPageForShipment =
+  //               currentHeightOfPageForShipment + 4 <= 277 &&
+  //               heightForSecondCol + 4 <= 277 &&
+  //               heightForThirdCol + 4 <= 277;
+  //             if (isCurrentPageForShipment) {
+  //               if (step === 0) {
+  //                 currentHeightOfPageForShipment += 4;
+  //                 doc.text(
+  //                   dishLineForShipment,
+  //                   8,
+  //                   currentHeightOfPageForShipment
+  //                 );
+  //               } else if (step === 1) {
+  //                 heightForSecondCol += 4;
+  //                 doc.text(dishLineForShipment, 78, heightForSecondCol);
+  //               } else {
+  //                 heightForThirdCol += 4;
+  //                 doc.text(dishLineForShipment, 148, heightForThirdCol);
+  //               }
+  //             } else {
+  //               doc.addPage();
+  //               currentHeightOfPageForShipment = 10;
+  //               heightForSecondCol = 10;
+  //               heightForThirdCol = 10;
+  //               step = 0;
+  //               if (step === 0) {
+  //                 currentHeightOfPageForShipment += 4;
+  //                 doc.text(
+  //                   dishLineForShipment,
+  //                   8,
+  //                   currentHeightOfPageForShipment
+  //                 );
+  //               } else if (step === 1) {
+  //                 heightForSecondCol += 4;
+  //                 doc.text(dishLineForShipment, 78, heightForSecondCol);
+  //               } else {
+  //                 heightForThirdCol += 4;
+  //                 doc.text(dishLineForShipment, 148, heightForThirdCol);
+  //               }
+  //             }
+  //           }
+  //         );
+  //         step = step + 1 > 2 ? 0 : step + 1;
+  //       }
+  //     );
+  //   });
+  // });
 
   return doc;
 };

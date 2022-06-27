@@ -331,7 +331,7 @@
           <DishCard
             v-for="dish in getIncorrectDishes"
             :key="dish.id"
-            :dishObject="dish"
+            :dishInfo="dish"
           />
           <v-divider class="mb-10 blue" style="width: 100%"></v-divider>
         </div>
@@ -348,14 +348,14 @@
           <DishCard
             v-for="dish in getDishesByName"
             :key="dish.id"
-            :dishObject="dish"
+            :dishInfo="dish"
           />
         </div>
         <div v-else>
           <DishCard
             v-for="dish in getCorrectDishes"
             :key="dish.id"
-            :dishObject="dish"
+            :dishInfo="dish"
           />
         </div>
       </div>
